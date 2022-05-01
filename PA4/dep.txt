@@ -1,0 +1,639 @@
+/*
+ * File: pager-predict.c
+ * Author:       Andy Sayler
+ *               http://www.andysayler.com
+ * Adopted From: Dr. Alva Couch
+ *               http://www.cs.tufts.edu/~couch/
+ *
+ * Project: CSCI 3753 Programming Assignment 4
+ * Create Date: Unknown
+ * Modify Date: 2012/04/03
+ * Description:
+ * 	This file contains a predictive pageit
+ *      implmentation.
+ */
+
+#include <stdio.h> 
+#include <stdlib.h>
+
+#include "simulator.h"
+
+void pageit(Pentry q[MAXPROCESSES]) {
+
+}
+
+// /* simple prediction which keeps pages 0,9 (default pages) at all times for all processes */
+// /* pages in current page and preeemptively pages in next page as well */
+// void pageit(Pentry q[MAXPROCESSES]) { 
+//     /* Local vars */
+//     int proctmp;
+//     int pagetmp;
+//
+//     /* loop through processes */
+//     for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
+//         /* check if process is active */
+//         if (q[proctmp].active) {
+//             /* set default predictions & current page */
+//             int predictions[MAXPROCPAGES] = { 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0 };
+//             pagetmp = q[proctmp].pc / PAGESIZE;
+//
+//             /* add current page and next 2 pages to prediction */
+//             predictions[pagetmp] = 1;
+//             predictions[pagetmp+1] = 1;
+//
+//             /* page in predictions, and out everything else */
+//             for (int i = 0; i < MAXPROCPAGES; i++) {
+//                 if (predictions[i] && !q[proctmp].pages[i]) pagein(proctmp, i);
+//                 else if (!predictions[i] && q[proctmp].pages[i]) pageout(proctmp, i);
+//             }
+//         }
+//     }
+// } 
+
+// /* GLOBAL WORKING SET IMPLEMENTATION */
+// // Each node has process & page number
+// typedef struct Node {
+//     struct Node *prev, *next;
+//     unsigned procNumber;
+//     unsigned pageNumber;
+// } Node;
+ 
+// // Queue for each working set
+// typedef struct Queue {
+//     unsigned count;                          // Number of filled frames
+//     unsigned numberOfFrames; // total number of frames
+//     Node *front, *rear;
+// } Queue;
+
+// Node* createNode(unsigned procNumber, unsigned pageNumber)
+// {
+//     Node* temp = (Node*)malloc(sizeof(Node));
+//     temp->procNumber = procNumber;
+//     temp->pageNumber = pageNumber;
+//     temp->prev = temp->next = NULL;
+//     return temp;
+// }
+
+// // Create an empty queue
+// Queue* createQueue()
+// {
+//     Queue* queue = (Queue*)malloc(sizeof(Queue));
+//     queue->count = 0;
+//     queue->front = queue->rear = NULL;
+//     queue->numberOfFrames = 25;
+//     return queue;
+// }
+
+// // A function to check if there is slot available in memory
+// int isQueueFull(Queue* queue)
+// {
+//     return queue->count == queue->numberOfFrames;
+// }
+ 
+// // A utility function to check if queue is empty
+// int isQueueEmpty(Queue* queue)
+// {
+//     return queue->rear == NULL;
+// }
+
+// // A utility function to delete a frame from queue
+// void pop(Queue* queue)
+// {
+//     if (isQueueEmpty(queue))
+//         return;
+ 
+//     // If this is the only node in list, then change front
+//     if (queue->front == queue->rear)
+//         queue->front = NULL;
+ 
+//     // Change rear and remove the previous rear
+//     Node* temp = queue->rear;    
+//     queue->rear = queue->rear->prev;
+ 
+//     if (queue->rear)
+//         queue->rear->next = NULL;
+    
+//     printf("Removing node %d, %d\n", temp->procNumber, temp->pageNumber);
+//     pageout(temp->procNumber, temp->pageNumber);
+//     free(temp);
+ 
+//     // decrement the number of full frames by 1
+//     queue->count--;
+// }
+
+// void put(Queue* working_set, int section, int page) {
+//     if (isQueueFull(working_set)) {
+//         pop(working_set);
+//     }
+
+//     Node* node = createNode(section, page);
+
+//     node->next = working_set->front;
+ 
+//     // If queue is empty, change both front and rear pointers
+//     if (isQueueEmpty(working_set))
+//         working_set->rear = working_set->front = node;
+//     else // Else change the front
+//     {
+//         working_set->front->prev = node;
+//         working_set->front = node;
+//     }
+
+//     working_set->count++;
+// }
+
+// Node* getNode(Queue* working_set, unsigned int section, unsigned int page) {
+//     for (unsigned int i = 0; i < working_set->numberOfFrames; i++) {
+//         Node* temp = working_set->front;
+//         if (temp == NULL) return NULL; // in case queue is empty 
+//         while (temp->next != NULL) {
+//             if (temp->procNumber == section && temp->pageNumber == page) {
+//                 return temp;
+//             }
+//             temp = temp->next;
+//         }
+//     }
+//     return NULL;
+// }
+
+// void update(Queue* working_set, int section, int page) {
+//     //pagein(section, page);
+//     Node* request = getNode(working_set, section, page);
+//     printf("Nodes in working set: %d\n", working_set->count);
+
+//     if (request == NULL) {
+//         printf("Adding new node %d, %d\n", section, page);
+//         put(working_set, section, page);
+//     } else if (isQueueFull(working_set) && request != working_set->front) {
+//         /* if node already in q move it to front */ 
+//         printf("Moving node %d, %d to front\n", section, page);
+//         // Fix refs for prev/next nodes
+//         request->prev->next = request->next;
+//         if (request->next)
+//             request->next->prev = request->prev;
+
+//         // Handle if node was rear
+//         if (request == working_set->rear) {
+//             working_set->rear = request->prev;
+//             working_set->rear->next = NULL;
+//         }
+
+//         // Put node at front
+//         request->next = working_set->front;
+//         request->prev = NULL;
+
+//         // Update previous front node
+//         request->next->prev = request;
+
+//         // Update front of queue
+//         working_set->front = request;
+//     }
+// }
+
+// void pageit(Pentry q[MAXPROCESSES]) {
+//     static int initialized = 0;
+//     static Queue* working_set;
+
+//     unsigned int proctmp;
+//     unsigned int pagetmp;
+
+//     if(!initialized) {
+// 	    working_set = createQueue();
+// 	    initialized = 1;
+//     }
+    
+    
+//     /* loop through processes */
+//     for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
+//         /* check if process is active, then if pages are swapped in */
+//         if (q[proctmp].active) { 
+//             pagetmp = q[proctmp].pc/PAGESIZE; // get current page
+            
+//             //update(working_set, proctmp, pagetmp);
+
+//             if (!q[proctmp].pages[pagetmp] && !pagein(proctmp,pagetmp)) {
+//                 update(working_set, proctmp, pagetmp);
+//             }
+//         }
+//     }  
+// }
+
+/* LOCAL WORKING SET IMPLEMENTATION */
+// #define WORKING_SET_SIZE 5
+
+// // Each node has process & page number
+// typedef struct QNode {
+//     struct QNode *prev, *next;
+//     unsigned procNumber;
+//     unsigned pageNumber;
+// } QNode;
+ 
+// // Queue for each working set
+// typedef struct Queue {
+//     unsigned count;          // Number of filled frames
+//     unsigned numberOfFrames; // total number of frames
+//     QNode *front, *rear;
+// } Queue;
+ 
+// // Hash to quickly get nodes
+// typedef struct MultiQueue {
+//     Queue* array[MAXPROCESSES]; // an array of queues
+// } MultiQueue;
+
+// // Create a QNode with given values
+// QNode* newQNode(unsigned procNumber, unsigned pageNumber)
+// {
+//     QNode* temp = (QNode*)malloc(sizeof(QNode));
+//     temp->procNumber = procNumber;
+//     temp->pageNumber = pageNumber;
+//     temp->prev = temp->next = NULL;
+//     return temp;
+// }
+ 
+// // Create an empty queue
+// Queue* createQueue()
+// {
+//     Queue* queue = (Queue*)malloc(sizeof(Queue));
+//     queue->count = 0;
+//     queue->front = queue->rear = NULL;
+//     queue->numberOfFrames = WORKING_SET_SIZE;
+//     return queue;
+// }
+ 
+// MultiQueue* createMultiQueue()
+// {
+//     // Allocate memory for multi queue
+//     MultiQueue* multiQueue = (MultiQueue*)malloc(sizeof(MultiQueue));
+ 
+//     for (int i = 0; i < MAXPROCESSES; i++) {
+//         multiQueue->array[i] = createQueue();
+//     }
+ 
+//     return multiQueue;
+// }
+
+// QNode* getNode(MultiQueue* multiQueue, unsigned int section, unsigned int page) {
+//     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+//         QNode* temp = multiQueue->array[section]->front;
+//         if (temp == NULL) return NULL; // in case queue is empty 
+//         while (temp->next != NULL) {
+//             if (temp->pageNumber == page) {
+//                 return temp;
+//             }
+//             temp = temp->next;
+//         }
+//     }
+//     return NULL;
+// }
+
+// // A function to check if there is slot available in memory
+// int isQueueFull(Queue* queue)
+// {
+//     return queue->count == queue->numberOfFrames;
+// }
+ 
+// // A utility function to check if queue is empty
+// int isQueueEmpty(Queue* queue)
+// {
+//     return queue->rear == NULL;
+// }
+ 
+// // A utility function to delete a frame from queue
+// void deQueue(Queue* queue)
+// {
+//     if (isQueueEmpty(queue))
+//         return;
+ 
+//     // If this is the only node in list, then change front
+//     if (queue->front == queue->rear)
+//         queue->front = NULL;
+ 
+//     // Change rear and remove the previous rear
+//     QNode* temp = queue->rear;    
+//     queue->rear = queue->rear->prev;
+ 
+//     if (queue->rear)
+//         queue->rear->next = NULL;
+    
+
+//     pageout(temp->procNumber, temp->pageNumber);
+//     free(temp);
+ 
+//     // decrement the number of full frames by 1
+//     queue->count--;
+// }
+ 
+// // A function to add a page with given 'pageNumber' to both queue
+// // and hash
+// void Enqueue(MultiQueue* working_set, unsigned procNumber, unsigned pageNumber)
+// {
+//     //printf("About to fill a frame\n");
+//     // If all frames are full, remove the page at the rear
+//     if (isQueueFull(working_set->array[procNumber])) {
+//         // remove page from multi queue
+//         deQueue(working_set->array[procNumber]);
+//     }
+ 
+//     // Create new node and add to queue
+//     QNode* temp = newQNode(procNumber, pageNumber);
+//     temp->next = working_set->array[procNumber]->front;
+ 
+//     // If queue is empty, change both front and rear pointers
+//     if (isQueueEmpty(working_set->array[procNumber]))
+//         working_set->array[procNumber]->rear = working_set->array[procNumber]->front = temp;
+//     else // Else change the front
+//     {
+//         working_set->array[procNumber]->front->prev = temp;
+//         working_set->array[procNumber]->front = temp;
+//     }
+ 
+//     // increment number of full frames
+//     working_set->array[procNumber]->count++;
+//     printf("%d frames filled\n", working_set->array[procNumber]->count);
+// }
+
+// void put(MultiQueue* working_set, int section, int page) {
+//     QNode* node = newQNode(section, page);
+
+//     node->next = working_set->array[node->procNumber]->front;
+ 
+//     // If queue is empty, change both front and rear pointers
+//     if (isQueueEmpty(working_set->array[node->procNumber]))
+//         working_set->array[node->procNumber]->rear = working_set->array[node->procNumber]->front = node;
+//     else // Else change the front
+//     {
+//         working_set->array[node->procNumber]->front->prev = node;
+//         working_set->array[node->procNumber]->front = node;
+//     }
+// }
+
+// void update(MultiQueue* working_set, int section, int page) {
+//     QNode* request = getNode(working_set, section, page);
+
+//     if (!isQueueFull(working_set->array[section]) && request == NULL) {
+//         put(working_set, section, page);
+//     } else if (request && request != working_set->array[section]->front) {
+//         /* if alreafy in q move it to front */ 
+//         // Fix refs for prev/next nodes
+//         request->prev->next = request->next;
+//         if (request->next)
+//             request->next->prev = request->prev;
+
+//         // Handle if node was rear
+//         if (request == working_set->array[section]->rear) {
+//             working_set->array[section]->rear = request->prev;
+//             working_set->array[section]->rear->next = NULL;
+//         }
+
+//         // Put node at front
+//         request->next = working_set->array[section]->front;
+//         request->prev = NULL;
+
+//         // Update previous front node
+//         request->next->prev = request;
+
+//         // Update front of queue
+//         working_set->array[section]->front = request;
+//         //deQueue(working_set->array[section]);
+//     } else if (request) {
+//         deQueue(working_set->array[section]);  
+//     } else {
+//         deQueue(working_set->array[section]);
+//         put(working_set, section, page);
+//     }
+// }
+
+// void pageit(Pentry q[MAXPROCESSES]) {
+//     static int initialized = 0;
+//     static MultiQueue* multiQueue;
+
+//     unsigned int proctmp;
+//     unsigned int pagetmp;
+
+//     if(!initialized) {
+// 	    multiQueue = createMultiQueue();
+// 	    initialized = 1;
+//     }
+ 
+//     /* loop through processes */
+//     for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
+//         /* check if process is active, then if pages are swapped in */
+//         if (q[proctmp].active) { 
+//             pagetmp = q[proctmp].pc/PAGESIZE; // get current page
+            
+//             if (!q[proctmp].pages[pagetmp] && !pagein(proctmp,pagetmp)) {
+
+//                 update(multiQueue, proctmp, pagetmp);
+//                 // // add page to queue if its not found
+//                 // QNode* reqPage = getNode(multiQueue, proctmp, pagetmp);
+ 
+//                 // if (reqPage == NULL)
+//                 //     Enqueue(multiQueue, proctmp, pagetmp);
+            
+//                 // // if page in queue, move it to front
+//                 // else if (reqPage != multiQueue->array[proctmp]->front) {
+//                 //     // Fix refs for prev/next nodes
+//                 //     reqPage->prev->next = reqPage->next;
+//                 //     if (reqPage->next)
+//                 //         reqPage->next->prev = reqPage->prev;
+            
+//                 //     // Handle if node was rear
+//                 //     if (reqPage == multiQueue->array[proctmp]->rear) {
+//                 //         multiQueue->array[proctmp]->rear = reqPage->prev;
+//                 //         multiQueue->array[proctmp]->rear->next = NULL;
+//                 //     }
+            
+//                 //     // Put node at front
+//                 //     reqPage->next = multiQueue->array[proctmp]->front;
+//                 //     reqPage->prev = NULL;
+            
+//                 //     // Update previous front node
+//                 //     reqPage->next->prev = reqPage;
+            
+//                 //     // Update front of queue
+//                 //     multiQueue->array[proctmp]->front = reqPage;
+                    
+//                 //     //printf("completed move a page to beginning");
+//                 // }
+//             }
+//         }
+//     }  
+// }
+
+// #define WORKING_SET_SIZE 5
+
+// typedef struct MultiQueue {
+//     int** queue;
+// } MultiQueue;
+
+// MultiQueue* createMultiQueue() {
+//     MultiQueue *working_set = (MultiQueue*)malloc(sizeof(MultiQueue));
+//     working_set->queue = (int**)malloc(MAXPROCESSES*sizeof(int*));
+//     for (int i = 0; i < MAXPROCESSES; i++) {
+//         working_set->queue[i] = (int*)malloc(WORKING_SET_SIZE*sizeof(int));
+//     }
+//     return working_set;
+// }
+
+// void update(MultiQueue* working_set, int section, int page) {
+//     int found = 0;
+//     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+//         if (working_set->queue[section][i] == page) {
+//             break;
+//         }
+//     }
+// } 
+
+// // int update(MultiQueue* queue, int section, int page) {
+// //     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+
+// //     }
+// // }
+
+// // int section_full(int array[MAXPROCESSES][WORKING_SET_SIZE], int section) {
+// //     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+// //         if (array[section][i] == -1) {
+// //             return 0;
+// //         }
+// //     }
+// //     return 1;
+// // }
+
+// // void update_section(int array[MAXPROCESSES][WORKING_SET_SIZE], int section, int page) {
+// //     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+
+// //     }
+// // }
+
+// void pageit(Pentry q[MAXPROCESSES]) { 
+    
+//     /* This file contains the stub for a predictive pager */
+//     /* You may need to add/remove/modify any part of this file */
+
+//     /* Static vars */
+//     static int initialized = 0;
+//     static int tick = 1; // artificial time
+//     static int timestamps[MAXPROCESSES][MAXPROCPAGES];
+//     // static int working_set[MAXPROCESSES][WORKING_SET_SIZE];
+//     static MultiQueue* working_set;
+
+//     /* Local vars */
+//     int proctmp;
+//     int pagetmp;
+//     int found;
+//     int old_time;
+//     int old_page;
+
+//     /* initialize static vars on first run */
+//     if(!initialized){
+// 	    for(proctmp=0; proctmp < MAXPROCESSES; proctmp++){
+// 	        for(pagetmp=0; pagetmp < MAXPROCPAGES; pagetmp++) {
+// 		        timestamps[proctmp][pagetmp] = 0; 
+// 	        }
+
+//             working_set = createMultiQueue();
+//             //for (int i = 0; i < WORKING_SET_SIZE; i++) {
+//             //    working_set[proctmp][i] = -1;
+//             //}
+// 	    }
+
+// 	    initialized = 1;
+//     }
+
+//     /* loop through processes */
+//     for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
+//         /* check if process is active */
+//         if (q[proctmp].active) { 
+//             pagetmp = q[proctmp].pc/PAGESIZE;    // get current page
+//             timestamps[proctmp][pagetmp] = tick; // set current proccess to now
+
+//             /* if the page cannot be swapped in, update working set & boot the rest of the pages */
+//             if (!q[proctmp].pages[pagetmp] && !pagein(proctmp,pagetmp)) {
+//                 old_time = tick;
+//                 // /* loop through pages, replace oldest working set pages with newer ones */
+//                 // for (int i = 0; i < MAXPROCPAGES; i++) {
+//                 //     /* find oldest page in working set */
+//                 //     for (int j = 0; j < WORKING_SET_SIZE; j++) {
+//                 //         if (q[proctmp].pages[working_set[proctmp][j]] && timestamps[proctmp][working_set[proctmp][j]] < old_time) {
+//                 //             old_time = timestamps[proctmp][working_set[proctmp][j]]; // cache time of oldest page
+//                 //             old_page = j;                                            // cache oldest page
+//                 //         }
+//                 //     }
+//                 //     /* replace old page with new page (in working set) */
+//                 //     working_set[proctmp][old_page] = i;    
+//                 // }
+
+//                 // /* make sure nothing in the working set is 'too old' */
+//                 // for (int j = 0; j < WORKING_SET_SIZE; j++) {
+//                 //     if (tick - timestamps[proctmp][working_set[proctmp][j]] > 100) {
+//                 //         working_set[proctmp][j] = -1;
+//                 //     }
+//                 // }
+
+//                 // if (section_full(working_set, proctmp)) {
+//                 //     /* replace oldest page in working set */
+//                 //     for (int j = 0; j < WORKING_SET_SIZE; j++) {
+//                 //         if (q[proctmp].pages[working_set->queue[proctmp][j]] && timestamps[proctmp][working_set->queue[proctmp][j]] < old_time) {
+//                 //             old_time = timestamps[proctmp][working_set->queue[proctmp][j]]; // cache time of oldest page
+//                 //             old_page = j;                                            // cache oldest page
+//                 //         }
+//                 //     }
+//                 //     working_set->queue[proctmp][old_page] = pagetmp; 
+//                 // } else {
+//                 //     /* add page to working set */
+//                 //     for (int i = 0; i < WORKING_SET_SIZE; i++) {
+//                 //         /* if page is already in working set then break */
+//                 //         if (working_set->queue[proctmp][i] == pagetmp) {
+//                 //             break;
+//                 //         }
+
+//                 //         if (working_set->queue[proctmp][i] == -1) {
+//                 //             working_set->queue[proctmp][i] = pagetmp;
+//                 //         }
+//                 //     }
+//                 // }
+
+//                 for (int j = 0; j < WORKING_SET_SIZE; j++) {
+//                     if (q[proctmp].pages[working_set->queue[proctmp][j]] && timestamps[proctmp][working_set->queue[proctmp][j]] < old_time) {
+//                         old_time = timestamps[proctmp][working_set->queue[proctmp][j]]; // cache time of oldest page
+//                         old_page = j;                                            // cache oldest page
+//                     }
+//                 }
+//                 working_set->queue[proctmp][old_page] = pagetmp;
+
+//                 /* loop through pages & boot any swapped in that are not in working set */
+//                 for (int i = 0; i < MAXPROCPAGES; i++) {
+//                     if (q[proctmp].pages[i]) {
+//                         found = 0;
+//                         /* checking if page is in working set */
+//                         for (int j = 0; j < WORKING_SET_SIZE; j++) { 
+//                             if (i == working_set->queue[proctmp][j]) {
+//                                 found = 1;
+//                                 break;
+//                             }
+//                         }   
+//                         /* pageout pages not in the working set */ 
+//                         if (!found) {
+//                             pageout(proctmp, i);
+//                         }  
+//                     }    
+//                 }
+//             } else {
+//                 /* add page to working set */
+//                 for (int i = 0; i < WORKING_SET_SIZE; i++) {
+//                     /* if page is already in working set then break */
+//                     if (working_set->queue[proctmp][i] == pagetmp) {
+//                         break;
+//                     }
+
+//                     if (working_set->queue[proctmp][i] == -1) {
+//                         working_set->queue[proctmp][i] = pagetmp;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+//     /* advance time for next pageit iteration */
+//     tick++;
+// } 
