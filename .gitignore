@@ -1,4 +1,5 @@
-*.psuedo
+*.gz
+*.pseudo
 
 # Prerequisites
 *.d
